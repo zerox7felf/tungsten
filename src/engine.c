@@ -4,8 +4,9 @@
 #include <SDL2/SDL.h>
 #include <assert.h>
 
-Engine engine_new(Logger* log) {
-    return (Engine) {
+Engine* engine_new(Logger* log) {
+    Engine* engine = malloc(sizeof(Engine));
+    *engine = (Engine) {
         .entities = NULL,
         .entities_allocated = 0,
         .num_entities = 0,
@@ -17,6 +18,7 @@ Engine engine_new(Logger* log) {
         .last_draw = 0,
         .running = 0
     };
+    return engine;
 }
 
 int engine_init(Engine* engine) {
@@ -48,6 +50,12 @@ void engine_quit(Engine* engine) {
     logger_log(engine->log, INFO, "Quitting");
 
     if (engine->entities != NULL) {
+        for (int i = 0; i < engine->num_entities; i++) {
+            if (engine->entities[i] != NULL && engine->entities[i]->free != NULL) {
+                engine->entities[i]->free();
+                free(engine->entities[i]);
+            }
+        }
         free(engine->entities);
         engine->entities = NULL;
     }
@@ -58,6 +66,7 @@ void engine_quit(Engine* engine) {
         SDL_DestroyWindow(engine->win);
 
     SDL_Quit();
+    free(engine);
 }
 
 void engine_update(Engine* engine) {
@@ -69,7 +78,7 @@ void engine_update(Engine* engine) {
     // TODO: update entities
     if (engine->entities != NULL) {
         for (int i = 0; i < engine->num_entities; i++) {
-            if (engine->entities[i] != NULL)
+            if (engine->entities[i] != NULL && engine->entities[i]->update != NULL)
                 engine->entities[i]->update(dt);
         }
     }
@@ -89,7 +98,7 @@ void engine_draw(Engine* engine) {
     // TODO: draw entities
     if (engine->entities != NULL) {
         for (int i = 0; i < engine->num_entities; i++) {
-            if (engine->entities[i] != NULL)
+            if (engine->entities[i] != NULL && engine->entities[i]->draw != NULL)
                 engine->entities[i]->draw(dt);
         }
     }
@@ -124,10 +133,14 @@ void engine_handle_events(Engine* engine) { //TODO: keyboard events for entities
 }
 
 void engine_add_entity(Engine* engine, Entity* entity) {
-    logger_log(engine->log, DEBUG, "Adding entity. num_entities: ");
+    logger_log(engine->log, DEBUG, "Adding entity. State:");
+    logger_log_i(engine->log, DEBUG, entity->state);
     assert(entity->state == UNINITIALIZED);
+
     entity->id = engine->entities_made++;
+    logger_log(engine->log, DEBUG, "entities_made:");
     logger_log_i(engine->log, DEBUG, engine->entities_made);
+
     engine->num_entities++;
     if (engine->num_entities > engine->entities_allocated) {
         if (engine->entities == NULL) {
@@ -136,7 +149,10 @@ void engine_add_entity(Engine* engine, Entity* entity) {
             engine->entities = realloc(engine->entities, engine->num_entities * sizeof(Entity*));
         }
     }
+
     engine->entities[engine->num_entities-1] = entity;
+    if (entity->init != NULL)
+        entity->init();
 }
 
 Entity* engine_get_entity(Engine* engine, int id) {

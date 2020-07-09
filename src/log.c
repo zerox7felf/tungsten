@@ -1,8 +1,11 @@
 #include "log.h"
 #include <stdio.h>
+#include <stdlib.h>
 
-Logger logger_new(Log_Level level) {
-    return (Logger){.level = level};
+Logger* logger_new(Log_Level level) {
+    Logger* logger = malloc(sizeof(Logger));
+    *logger = (Logger){.level = level};
+    return logger;
 }
 
 void logger_set_level(Logger* logger, Log_Level level) {

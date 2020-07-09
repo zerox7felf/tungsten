@@ -17,7 +17,7 @@ typedef struct {
     int running;
 } Engine;
 
-Engine engine_new(Logger* log);
+Engine* engine_new(Logger* log);
 int engine_init(Engine* engine);
 void engine_quit(Engine* engine);
 void engine_update(Engine* engine);
