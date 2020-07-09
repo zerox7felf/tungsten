@@ -1,11 +1,15 @@
-#include <engine.h>
-#include <log.h>
+#include "engine.h"
+#include "entity.h"
+#include "log.h"
 #include <SDL2/SDL.h>
+#include <assert.h>
 
 Engine engine_new(Logger* log) {
     return (Engine) {
         .entities = NULL,
-        .numEntities = 0,
+        .entities_allocated = 0,
+        .num_entities = 0,
+        .entities_made = 0,
         .win = NULL,
         .ren = NULL,
         .log = log,
@@ -43,6 +47,11 @@ int engine_init(Engine* engine) {
 void engine_quit(Engine* engine) {
     logger_log(engine->log, INFO, "Quitting");
 
+    if (engine->entities != NULL) {
+        free(engine->entities);
+        engine->entities = NULL;
+    }
+
     if (engine->ren != NULL)
         SDL_DestroyRenderer(engine->ren);
     if (engine->win != NULL)
@@ -58,6 +67,12 @@ void engine_update(Engine* engine) {
     logger_log_i(engine->log, DEBUG, dt);
 
     // TODO: update entities
+    if (engine->entities != NULL) {
+        for (int i = 0; i < engine->num_entities; i++) {
+            if (engine->entities[i] != NULL)
+                engine->entities[i]->update(dt);
+        }
+    }
 
     engine->last_update = now;
 }
@@ -72,6 +87,12 @@ void engine_draw(Engine* engine) {
     SDL_RenderClear(engine->ren);
 
     // TODO: draw entities
+    if (engine->entities != NULL) {
+        for (int i = 0; i < engine->num_entities; i++) {
+            if (engine->entities[i] != NULL)
+                engine->entities[i]->draw(dt);
+        }
+    }
 
     SDL_RenderPresent(engine->ren);
     engine->last_draw = now;
@@ -100,4 +121,28 @@ void engine_handle_events(Engine* engine) { //TODO: keyboard events for entities
                 break;
         }
     }
+}
+
+void engine_add_entity(Engine* engine, Entity* entity) {
+    logger_log(engine->log, DEBUG, "Adding entity. num_entities: ");
+    assert(entity->state == UNINITIALIZED);
+    entity->id = engine->entities_made++;
+    logger_log_i(engine->log, DEBUG, engine->entities_made);
+    engine->num_entities++;
+    if (engine->num_entities > engine->entities_allocated) {
+        if (engine->entities == NULL) {
+            engine->entities = malloc(engine->num_entities * sizeof(Entity*));
+        } else {
+            engine->entities = realloc(engine->entities, engine->num_entities * sizeof(Entity*));
+        }
+    }
+    engine->entities[engine->num_entities-1] = entity;
+}
+
+Entity* engine_get_entity(Engine* engine, int id) {
+    for (int i = 0; i < engine->num_entities; i++) {
+        if (engine->entities[i]->id == id)
+            return engine->entities[i];
+    }
+    return NULL;
 }
