@@ -43,6 +43,8 @@ int engine_init(Engine* engine) {
         return 1;
     }
 
+    engine->keyboard_state = SDL_GetKeyboardState(NULL);
+
     return 0;
 }
 
@@ -52,7 +54,7 @@ void engine_quit(Engine* engine) {
     if (engine->entities != NULL) {
         for (int i = 0; i < engine->num_entities; i++) {
             if (engine->entities[i] != NULL && engine->entities[i]->free != NULL) {
-                engine->entities[i]->free();
+                engine->entities[i]->free(engine->entities[i]);
                 free(engine->entities[i]);
             }
         }
@@ -78,8 +80,10 @@ void engine_update(Engine* engine) {
     // TODO: update entities
     if (engine->entities != NULL) {
         for (int i = 0; i < engine->num_entities; i++) {
-            if (engine->entities[i] != NULL && engine->entities[i]->update != NULL)
-                engine->entities[i]->update(dt);
+            if (engine->entities[i] != NULL) {
+                if (engine->entities[i]->update != NULL)
+                    engine->entities[i]->update(engine->entities[i], dt);
+            }
         }
     }
 
@@ -99,7 +103,7 @@ void engine_draw(Engine* engine) {
     if (engine->entities != NULL) {
         for (int i = 0; i < engine->num_entities; i++) {
             if (engine->entities[i] != NULL && engine->entities[i]->draw != NULL)
-                engine->entities[i]->draw(dt);
+                engine->entities[i]->draw(engine->entities[i], dt);
         }
     }
 
@@ -152,7 +156,7 @@ void engine_add_entity(Engine* engine, Entity* entity) {
 
     engine->entities[engine->num_entities-1] = entity;
     if (entity->init != NULL)
-        entity->init();
+        entity->init(entity);
 }
 
 Entity* engine_get_entity(Engine* engine, int id) {

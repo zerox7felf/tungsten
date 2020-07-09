@@ -14,6 +14,7 @@ typedef struct {
     Logger* log;
     Uint32 last_update;
     Uint32 last_draw;
+    const Uint8* keyboard_state;
     int running;
 } Engine;
 
