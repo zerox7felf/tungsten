@@ -11,7 +11,8 @@ typedef enum {
     DEAD
 } Entity_State;
 
-#define ENTTYPE_PLAYER 0
+#define ENTTYPE_NONE 0
+#define ENTTYPE_PLAYER 1
 // ^- make enum?
 
 typedef struct {
