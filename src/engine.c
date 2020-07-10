@@ -77,7 +77,6 @@ void engine_update(Engine* engine) {
     int dt = now - engine->last_update;
     logger_log_i(engine->log, DEBUG, dt);
 
-    // TODO: update entities
     if (engine->entities != NULL) {
         for (int i = 0; i < engine->num_entities; i++) {
             if (engine->entities[i] != NULL) {
@@ -99,7 +98,6 @@ void engine_draw(Engine* engine) {
     SDL_SetRenderDrawColor(engine->ren, 0, 0, 0, 0);
     SDL_RenderClear(engine->ren);
 
-    // TODO: draw entities
     if (engine->entities != NULL) {
         for (int i = 0; i < engine->num_entities; i++) {
             if (engine->entities[i] != NULL && engine->entities[i]->draw != NULL)

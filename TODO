@@ -1,0 +1,7 @@
+ - More effective use of engine->entities.
+    Slots for de-allocated entities will remain empty.
+    Instead, we should re-use these slots when adding
+    new entities.
+ - Event management for entities
+    ...other than keyboardstate.
+ - Remove 60 fps lock
