@@ -32,6 +32,9 @@ static void player_draw(void* entity, int dt) {
 }
 
 static void player_free(void* entity) {
+    Player_Data* player_data = ((Entity*)entity)->entity_data;
+    free(player_data);
+    ((Entity*)entity)->entity_data = NULL;
 }
 
 Entity* player_new(void* engine, int x, int y, float speed) {
