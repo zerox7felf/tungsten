@@ -4,6 +4,7 @@
 #include "lambda.h"
 #include "player.h"
 #include "map.h"
+#include "camera_terrain.h"
 #include <SDL2/SDL.h>
 #include <assert.h>
 
@@ -16,6 +17,7 @@ int main() {
     Entity* player = player_new(engine, 200,200,0.5);
 
     Map* test_map = map_new_bmp("test.bmp");
+    Map* test_map_color = map_new_bmp("test_color.bmp");
     Entity* map_viewer = entity_new(
         engine, ENTTYPE_NONE, NULL, NULL,
         lambda(void, (void* entity, int dt), {
@@ -30,15 +32,18 @@ int main() {
         }),
         NULL
     );
-    map_viewer->entity_data = test_map;
+    Entity* camera_terrain = camera_terrain_new(engine, 250, 400, 200, 0, test_map, test_map_color);
+    map_viewer->entity_data = test_map_color;
 
     if (engine_init(engine) == 0) {
         logger_log(logger, DEBUG, "Success!");
-        engine_add_entity(engine, player);
-        engine_add_entity(engine, map_viewer);
+        //engine_add_entity(engine, player);
+        engine_add_entity(engine, camera_terrain);
+        //engine_add_entity(engine, map_viewer);
         engine_run(engine);
     }
 
     map_free(test_map);
+    map_free(test_map_color);
     engine_quit(engine);
 }

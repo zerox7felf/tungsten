@@ -13,6 +13,7 @@ typedef enum {
 
 #define ENTTYPE_NONE 0
 #define ENTTYPE_PLAYER 1
+#define ENTTYPE_CAMERA 2
 // ^- make enum?
 
 typedef struct {
