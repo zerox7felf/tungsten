@@ -5,7 +5,9 @@
 #include "player.h"
 #include "map.h"
 #include "camera_terrain.h"
+#include "debug_map.h"
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <assert.h>
 
 Logger* logger;
@@ -18,28 +20,15 @@ int main() {
 
     Map* test_map = map_new_bmp("test.bmp");
     Map* test_map_color = map_new_bmp("test_color.bmp");
-    Entity* map_viewer = entity_new(
-        engine, ENTTYPE_NONE, NULL, NULL,
-        lambda(void, (void* entity, int dt), {
-            Map* map = (Map*)((Entity*)entity)->entity_data;
-            for (int x = 0; x < map->surface->w; x++) {
-                for (int y = 0; y < map->surface->h; y++) {
-                    SDL_Color color = map_get_coords(map, x, y);
-                    SDL_SetRenderDrawColor(engine->ren, color.r, color.g, color.b, 255);
-                    SDL_RenderDrawPoint(engine->ren, x, y);
-                }
-            }
-        }),
-        NULL
-    );
+
     Entity* camera_terrain = camera_terrain_new(engine, 250, 400, 200, 0, test_map, test_map_color);
-    map_viewer->entity_data = test_map_color;
+    Entity* debug_map = debug_map_new(engine, test_map, camera_terrain->entity_data);
 
     if (engine_init(engine) == 0) {
         logger_log(logger, DEBUG, "Success!");
         //engine_add_entity(engine, player);
         engine_add_entity(engine, camera_terrain);
-        //engine_add_entity(engine, map_viewer);
+        //engine_add_entity(engine, debug_map);
         engine_run(engine);
     }
 

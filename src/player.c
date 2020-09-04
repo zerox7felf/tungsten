@@ -13,6 +13,9 @@ static void player_init(void* entity) {
 static void player_update(void* entity, int dt) {
     Player_Data* player_data = ((Entity*)entity)->entity_data;
     Engine* engine = ((Entity*)entity)->engine;
+
+    float cosdir = cos(player_data->dir);
+    float sindir = sin(player_data->dir);
     if (engine->keyboard_state[SDL_SCANCODE_W])
         player_data->y--;
     if (engine->keyboard_state[SDL_SCANCODE_S])
@@ -49,7 +52,7 @@ Entity* player_new(void* engine, int x, int y, float speed) {
 
     Player_Data* player_data = malloc(sizeof(Player_Data));
     *player_data = (Player_Data){
-        .y = y, .x = x, .speed = speed
+        .y = y, .x = x, .speed = speed, .dir = 0
     };
     player->entity_data = player_data;
 

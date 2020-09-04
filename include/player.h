@@ -4,6 +4,7 @@
 
 typedef struct {
     int x,y;
+    float dir;
     float speed;
 } Player_Data;
 

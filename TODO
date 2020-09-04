@@ -4,4 +4,4 @@
     new entities.
  - Event management for entities
     ...other than keyboardstate.
- - Remove 60 fps lock
+ - Fix inacurate controls

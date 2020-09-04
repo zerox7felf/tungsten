@@ -2,7 +2,9 @@
 #include "entity.h"
 #include "log.h"
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <assert.h>
+#include <stdio.h>
 
 Engine* engine_new(Logger* log) {
     Engine* engine = malloc(sizeof(Engine));
@@ -14,6 +16,7 @@ Engine* engine_new(Logger* log) {
         .win = NULL,
         .ren = NULL,
         .log = log,
+        .font = NULL,
         .last_update = 0,
         .last_draw = 0,
         .running = 0
@@ -23,9 +26,23 @@ Engine* engine_new(Logger* log) {
 
 int engine_init(Engine* engine) {
     logger_log(engine->log, INFO, "Initializing");
-    if(SDL_Init(SDL_INIT_VIDEO) != 0) {
+
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         logger_log(engine->log, ERROR, "Couldn't initialize SDL:");
         logger_log(engine->log, ERROR, SDL_GetError());
+        return 1;
+    }
+
+    if (TTF_Init() == -1) {
+        logger_log(engine->log, ERROR, "Couldn't initialize SDL_TTF:");
+        logger_log(engine->log, ERROR, TTF_GetError());
+        return 1;
+    }
+
+    engine->font = TTF_OpenFont("assets/fonts/VeraMono.ttf", 14);
+    if (!engine->font) {
+        logger_log(engine->log, ERROR, "Couldn't load font:");
+        logger_log(engine->log, ERROR, TTF_GetError());
         return 1;
     }
 
@@ -67,6 +84,7 @@ void engine_quit(Engine* engine) {
     if (engine->win != NULL)
         SDL_DestroyWindow(engine->win);
 
+    TTF_Quit();
     SDL_Quit();
     free(engine);
 }
@@ -86,6 +104,10 @@ void engine_update(Engine* engine) {
         }
     }
 
+    Uint32 after = SDL_GetTicks();
+    int duration = after - now;
+    logger_log_i(engine->log, DEBUG, duration);
+
     engine->last_update = now;
 }
 
@@ -95,8 +117,8 @@ void engine_draw(Engine* engine) {
     int dt = now - engine->last_draw;
     logger_log_i(engine->log, DEBUG, dt);
 
-    SDL_SetRenderDrawColor(engine->ren, 0, 0, 0, 0);
-    SDL_RenderClear(engine->ren);
+    //SDL_SetRenderDrawColor(engine->ren, 0, 0, 0, 0);
+    //SDL_RenderClear(engine->ren);
 
     if (engine->entities != NULL) {
         for (int i = 0; i < engine->num_entities; i++) {
@@ -105,7 +127,24 @@ void engine_draw(Engine* engine) {
         }
     }
 
+    char text[200];
+    snprintf(text, 200, "FPS:%d", 1000/dt);
+
+    SDL_Color text_color = (SDL_Color) {.r = 255, .g = 255, .b = 255};
+    SDL_Surface* text_surface = TTF_RenderText_Solid(engine->font, text, text_color);
+    SDL_Texture* text_texture =  SDL_CreateTextureFromSurface(engine->ren, text_surface);
+    SDL_Rect rect = {.x = 0, .y = 0, .w = text_surface->w, .h = text_surface->h};
+    SDL_RenderCopy(engine->ren, text_texture, NULL, &rect);
+
+    SDL_FreeSurface(text_surface);
+    SDL_DestroyTexture(text_texture);
+
     SDL_RenderPresent(engine->ren);
+
+    Uint32 after = SDL_GetTicks();
+    int duration = after - now;
+    logger_log_i(engine->log, DEBUG, duration);
+
     engine->last_draw = now;
 }
 
@@ -115,7 +154,14 @@ void engine_run(Engine* engine) {
         engine_update(engine);
         engine_draw(engine);
         engine_handle_events(engine);
-        SDL_Delay(16); //TODO: compensate for time lost in update and draw
+
+        Uint32 now = SDL_GetTicks();
+        int dt = now - engine->last_draw;
+
+        if (dt < 16)
+            SDL_Delay(16-dt);
+        //else
+        //  SDL_Delay(1);
     }
 }
 

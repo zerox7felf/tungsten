@@ -3,6 +3,7 @@
 #include "entity.h"
 #include "log.h"
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
 typedef struct {
     Entity** entities;
@@ -11,6 +12,7 @@ typedef struct {
     int entities_made;
     SDL_Window* win;
     SDL_Renderer* ren;
+    TTF_Font* font;
     Logger* log;
     Uint32 last_update;
     Uint32 last_draw;
