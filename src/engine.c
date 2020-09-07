@@ -46,7 +46,7 @@ int engine_init(Engine* engine) {
         return 1;
     }
 
-    engine->win = SDL_CreateWindow("tungsten", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, 0);
+    engine->win = SDL_CreateWindow("tungsten", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1920, 1080, 0);
     if (engine->win == NULL) {
         logger_log(engine->log, ERROR, "Couldn't create window:");
         logger_log(engine->log, ERROR, SDL_GetError());
@@ -133,7 +133,7 @@ void engine_draw(Engine* engine) {
     SDL_Color text_color = (SDL_Color) {.r = 255, .g = 255, .b = 255};
     SDL_Surface* text_surface = TTF_RenderText_Solid(engine->font, text, text_color);
     SDL_Texture* text_texture =  SDL_CreateTextureFromSurface(engine->ren, text_surface);
-    SDL_Rect rect = {.x = 0, .y = 0, .w = text_surface->w, .h = text_surface->h};
+    SDL_Rect rect = {.x = 12, .y = 12, .w = text_surface->w, .h = text_surface->h};
     SDL_RenderCopy(engine->ren, text_texture, NULL, &rect);
 
     SDL_FreeSurface(text_surface);
