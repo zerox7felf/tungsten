@@ -2,7 +2,7 @@ CC=gcc
 INCLUDE_DIR=include
 SRC_DIR=src
 BUILD_DIR=bin
-FLAGS=-I$(INCLUDE_DIR) -Wall -lSDL2 -lm -lSDL2_ttf
+FLAGS=-I$(INCLUDE_DIR) -Wall `sdl-config --cflags` -lSDL2 -lm -lSDL2_ttf  -lSDL2_image
 
 OBJS=log
 
@@ -33,7 +33,7 @@ $(BUILD_DIR)/log.o: $(INCLUDE_DIR)/log.h $(SRC_DIR)/log.c
 	$(CC) -c $(SRC_DIR)/log.c $(FLAGS) -o $(BUILD_DIR)/log.o
 
 $(BUILD_DIR)/tungsten: $(SRC_DIR)/main.c $(BUILD_DIR)/log.o $(BUILD_DIR)/engine.o $(BUILD_DIR)/entity.o $(BUILD_DIR)/player.o $(BUILD_DIR)/map.o $(BUILD_DIR)/debug_map.o $(BUILD_DIR)/camera_terrain.o $(BUILD_DIR)/common.o
-	$(CC) $(SRC_DIR)/main.c $(BUILD_DIR)/log.o $(BUILD_DIR)/engine.o $(BUILD_DIR)/entity.o  $(BUILD_DIR)/player.o $(BUILD_DIR)/map.o $(BUILD_DIR)/camera_terrain.o $(BUILD_DIR)/debug_map.o $(BUILD_DIR)/common.o $(FLAGS) -o $(BUILD_DIR)/tungsten
+	$(CC) $(SRC_DIR)/main.c $(BUILD_DIR)/log.o $(BUILD_DIR)/engine.o $(BUILD_DIR)/entity.o $(BUILD_DIR)/player.o $(BUILD_DIR)/map.o $(BUILD_DIR)/camera_terrain.o $(BUILD_DIR)/debug_map.o $(BUILD_DIR)/common.o $(FLAGS) -o $(BUILD_DIR)/tungsten
 
 .PHONY: run clean
 

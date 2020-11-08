@@ -18,8 +18,8 @@ int main() {
     engine = engine_new(logger);
     Entity* player = player_new(engine, 200,200,0.5);
 
-    Map* test_map = map_new_bmp("test3.bmp");
-    Map* test_map_color = map_new_bmp("test3_color.bmp");
+    Map* test_map = map_new_bmp("test4.png");
+    Map* test_map_color = map_new_bmp("test4_color.png");
 
     Entity* camera_terrain = camera_terrain_new(engine, 250, 400, 200, 0, test_map, test_map_color);
     Entity* debug_map = debug_map_new(engine, test_map, camera_terrain->entity_data);
