@@ -28,7 +28,7 @@ static Log_Color log_colors[4] = {
     (Log_Color){.bright = "0",      .faint = "0"        },
     (Log_Color){.bright = "0",      .faint = "0"        },
     (Log_Color){.bright = "103;30", .faint = "43;30"    },
-    (Log_Color){.bright = "101;97", .faint = "101;97"   },
+    (Log_Color){.bright = "101;97", .faint = "41;97"   },
 };
 
 void logger_log(const Logger* logger, Log_Level level, const char* message) {
