@@ -1,3 +1,6 @@
+==================================================
+                       TODO
+==================================================
  - More effective use of engine->entities.
     Slots for de-allocated entities will remain empty.
     Instead, we should re-use these slots when adding
@@ -5,3 +8,17 @@
  - Event management for entities
     ...other than keyboardstate.
  - Maintain fov when changing window size
+ - Map rendering with 2d z-buffer
+ - Multiple z-layers in map format
+ - Multiple z-layers in map rendering
+
+==================================================
+                    In Progress
+==================================================
+ - Map format
+
+==================================================
+                        Done
+==================================================
+
+ - Log prompt

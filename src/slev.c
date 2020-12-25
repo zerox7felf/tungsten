@@ -40,9 +40,16 @@ int main(int argc, char* argv[]) {
     color_map_height =  color_map->surface->h > height_map->surface->h ?  1 :
                         color_map->surface->h < height_map->surface->h ? -1 : 0;
 
-    if (color_map_width != 0 && color_map_height != 0) {
-        logger_log(logger, INFO, "Images are of different sizes. Crop to smallest common dimensions?");
-
+    while (true) {
+        if (color_map_width != 0 && color_map_height != 0) {
+            logger_log(logger, INFO, "Images are of different sizes. Crop to smallest common dimensions?");
+            Logger_Option options[2] = {
+                (Logger_Option){.option='y', .description="Yes", .is_default=true},
+                (Logger_Option){.option='n', .description="No", .is_default=false}
+            };
+            Logger_Option opt = logger_prompt(logger, INFO, options, 2);
+            logger_log(logger, INFO, opt.option == 'y' ? "YES" : "NO");
+        }
     }
 
     map_free(color_map);

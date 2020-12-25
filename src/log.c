@@ -51,6 +51,45 @@ void logger_log_i(const Logger* logger, Log_Level level, const int message) {
     }
 }
 
-char logger_prompt(const Logger* logger, Log_Level level, const char* options, const int n_options, const char def_option) {
+Logger_Option logger_prompt(const Logger* logger, Log_Level level, const Logger_Option* options, const int n_options) {
     // getch, ret char if in options, else ret def_option
+    if (level >= logger->level) {
+        int default_index = -1;
+        for (int i = 0; i < n_options; i++) {
+            printf("%c[%sm", 27, log_colors[level].faint);
+            printf("%c[2K", 27);
+            if (options[i].is_default) {
+                default_index = i;
+                printf("%c[%sm %c %c[%sm (Default) %s", 27, log_colors[level].bright, options[i].option, 27, log_colors[level].faint, options[i].description);
+            } else {
+                printf("%c[%sm %c %c[%sm %s", 27, log_colors[level].bright, options[i].option, 27, log_colors[level].faint, options[i].description);
+            }
+
+            printf("%c[0m\n", 27);
+        }
+
+        printf("%c[%sm", 27, log_colors[level].faint);
+        printf("%c[2K", 27);
+        printf("%c[%sm %s %c[%sm ", 27, log_colors[level].bright, ">", 27, log_colors[level].faint);
+
+        char opt = (char)getchar();
+        if (opt != '\n') while(getchar() != '\n');
+
+        printf("%c[1F%c[0m\n", 27, 27);
+
+        for (int i = 0; i < n_options; i++) {
+            if (opt == options[i].option) return options[i];
+        }
+
+        if (default_index == -1) return options[0];
+        else return options[default_index];
+    } else {
+        int default_index = -1;
+        for (int i = 0; i < n_options; i++) {
+            if (options[i].is_default) default_index = i;
+        }
+
+        if (default_index == -1) return options[0];
+        else return options[default_index];
+    }
 }
