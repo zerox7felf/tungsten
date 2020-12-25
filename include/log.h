@@ -15,3 +15,4 @@ Logger* logger_new(Log_Level level);
 void logger_set_level(Logger* logger, Log_Level level);
 void logger_log(const Logger* logger, Log_Level level, const char* message);
 void logger_log_i(const Logger* logger, Log_Level level, const int message);
+char logger_prompt(const Logger* logger, Log_Level level, const char* options, const int n_options, const char def_option);

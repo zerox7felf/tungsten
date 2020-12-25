@@ -8,6 +8,8 @@ OBJS=log
 
 all: $(BUILD_DIR)/tungsten
 
+slev: $(BUILD_DIR)/slev
+
 $(BUILD_DIR)/common.o: $(INCLUDE_DIR)/common.h $(SRC_DIR)/common.c
 	$(CC) -c $(SRC_DIR)/common.c $(FLAGS) -o $(BUILD_DIR)/common.o
 
@@ -34,6 +36,9 @@ $(BUILD_DIR)/log.o: $(INCLUDE_DIR)/log.h $(SRC_DIR)/log.c
 
 $(BUILD_DIR)/tungsten: $(SRC_DIR)/main.c $(BUILD_DIR)/log.o $(BUILD_DIR)/engine.o $(BUILD_DIR)/entity.o $(BUILD_DIR)/player.o $(BUILD_DIR)/map.o $(BUILD_DIR)/debug_map.o $(BUILD_DIR)/camera_terrain.o $(BUILD_DIR)/common.o
 	$(CC) $(SRC_DIR)/main.c $(BUILD_DIR)/log.o $(BUILD_DIR)/engine.o $(BUILD_DIR)/entity.o $(BUILD_DIR)/player.o $(BUILD_DIR)/map.o $(BUILD_DIR)/camera_terrain.o $(BUILD_DIR)/debug_map.o $(BUILD_DIR)/common.o $(FLAGS) -o $(BUILD_DIR)/tungsten
+
+$(BUILD_DIR)/slev: $(SRC_DIR)/slev.c $(BUILD_DIR)/log.o $(BUILD_DIR)/map.o $(BUILD_DIR)/common.o
+	$(CC) $(SRC_DIR)/slev.c $(BUILD_DIR)/log.o $(BUILD_DIR)/map.o $(BUILD_DIR)/common.o $(FLAGS) -o $(BUILD_DIR)/slev
 
 .PHONY: run clean
 
