@@ -2,6 +2,8 @@
 
 #include <SDL2/SDL.h>
 
+//  Map used for color and heightmaps
+
 typedef struct {
     SDL_Surface* surface;
 } Map;

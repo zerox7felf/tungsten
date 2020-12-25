@@ -34,11 +34,14 @@ $(BUILD_DIR)/engine.o: $(INCLUDE_DIR)/engine.h $(SRC_DIR)/engine.c
 $(BUILD_DIR)/log.o: $(INCLUDE_DIR)/log.h $(SRC_DIR)/log.c
 	$(CC) -c $(SRC_DIR)/log.c $(FLAGS) -o $(BUILD_DIR)/log.o
 
+$(BUILD_DIR)/slev_map.o: $(INCLUDE_DIR)/slev_map.h $(SRC_DIR)/slev_map.c
+	$(CC) -c $(SRC_DIR)/slev_map.c $(FLAGS) -o $(BUILD_DIR)/slev_map.o
+
 $(BUILD_DIR)/tungsten: $(SRC_DIR)/main.c $(BUILD_DIR)/log.o $(BUILD_DIR)/engine.o $(BUILD_DIR)/entity.o $(BUILD_DIR)/player.o $(BUILD_DIR)/map.o $(BUILD_DIR)/debug_map.o $(BUILD_DIR)/camera_terrain.o $(BUILD_DIR)/common.o
 	$(CC) $(SRC_DIR)/main.c $(BUILD_DIR)/log.o $(BUILD_DIR)/engine.o $(BUILD_DIR)/entity.o $(BUILD_DIR)/player.o $(BUILD_DIR)/map.o $(BUILD_DIR)/camera_terrain.o $(BUILD_DIR)/debug_map.o $(BUILD_DIR)/common.o $(FLAGS) -o $(BUILD_DIR)/tungsten
 
-$(BUILD_DIR)/slev: $(SRC_DIR)/slev.c $(BUILD_DIR)/log.o $(BUILD_DIR)/map.o $(BUILD_DIR)/common.o
-	$(CC) $(SRC_DIR)/slev.c $(BUILD_DIR)/log.o $(BUILD_DIR)/map.o $(BUILD_DIR)/common.o $(FLAGS) -o $(BUILD_DIR)/slev
+$(BUILD_DIR)/slev: $(SRC_DIR)/slev.c $(BUILD_DIR)/log.o $(BUILD_DIR)/map.o $(BUILD_DIR)/common.o $(BUILD_DIR)/slev_map.o
+	$(CC) $(SRC_DIR)/slev.c $(BUILD_DIR)/log.o $(BUILD_DIR)/map.o $(BUILD_DIR)/common.o $(BUILD_DIR)/slev_map.o $(FLAGS) -o $(BUILD_DIR)/slev
 
 .PHONY: run clean
 

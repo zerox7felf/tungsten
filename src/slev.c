@@ -1,5 +1,6 @@
 #include "log.h"
 #include "map.h"
+#include "slev_map.h"
 #include <SDL2/SDL.h>
 
 // Slev is the mapmaker for tungsten, combining heightmaps and colormaps into a single binary format.
@@ -40,18 +41,30 @@ int main(int argc, char* argv[]) {
     color_map_height =  color_map->surface->h > height_map->surface->h ?  1 :
                         color_map->surface->h < height_map->surface->h ? -1 : 0;
 
-    while (true) {
-        if (color_map_width != 0 && color_map_height != 0) {
-            logger_log(logger, INFO, "Images are of different sizes. Crop to smallest common dimensions?");
-            Logger_Option options[2] = {
-                (Logger_Option){.option='y', .description="Yes", .is_default=true},
-                (Logger_Option){.option='n', .description="No", .is_default=false}
-            };
-            Logger_Option opt = logger_prompt(logger, INFO, options, 2);
-            logger_log(logger, INFO, opt.option == 'y' ? "YES" : "NO");
+    // crop to shortest. use these for calculations later.
+    int map_width = color_map_width == -1 ? color_map->surface->w : height_map->surface->w;
+    int map_height = color_map_height == -1 ? color_map->surface->h : height_map->surface->h;
+
+    if (color_map_width != 0 && color_map_height != 0) {
+        logger_log(logger, INFO, "Images are of different sizes. Crop to smallest common dimensions?");
+        Logger_Option options[2] = {
+            (Logger_Option){.option='y', .description="Yes", .is_default=true},
+            (Logger_Option){.option='n', .description="No", .is_default=false}
+        };
+        Logger_Option opt = logger_prompt(logger, INFO, options, 2);
+
+        if (opt.option == 'n') {
+            logger_log(logger, ERROR, "Mapsizes do not match.");
+            map_free(color_map);
+            map_free(height_map);
+            return 1;
         }
     }
 
+    logger_log(logger, INFO, "Loading height and color map into slev format...");
+    Slev_Map* output_map = slev_map_from_hc_maps(color_map, height_map, map_width, map_height);
+    
+    slev_map_free(output_map);
     map_free(color_map);
     map_free(height_map);
 
