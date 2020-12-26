@@ -23,7 +23,8 @@ int main() {
     Map* test_map_color = map_new_bmp("test4_color.png");
 
     //Entity* camera_terrain = camera_terrain_new(engine, 250, 400, 200, 0, test_map, test_map_color);
-    Slev_Map* map = slev_map_from_hc_maps(test_map_color, test_map, test_map->surface->w, test_map->surface->h);
+    //Slev_Map* map = slev_map_from_hc_maps(test_map_color, test_map, test_map->surface->w, test_map->surface->h);
+    Slev_Map* map = slev_map_from_file("testmap.slev");
 
     Entity* camera_terrain = camera_terrain_new(engine, 250, 400, 200, 0, map);
     //Entity* debug_map = debug_map_new(engine, map, camera_terrain->entity_data);

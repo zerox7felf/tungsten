@@ -62,6 +62,15 @@ int main(int argc, char* argv[]) {
     }
 
     Slev_Map* output_map = slev_map_from_hc_maps(color_map, height_map, map_width, map_height);
+
+    if (!Slev_map_save(output_map, "testmap.slev"))
+        logger_log(logger, ERROR, "Unable to save converted map.");
+
+    Slev_Map* output_map_loaded = slev_map_from_file("testmap.slev");
+    if (output_map_loaded == NULL)
+        logger_log(logger, ERROR, "Unable to load file");
+    else
+        slev_map_free(output_map_loaded);
     
     slev_map_free(output_map);
     map_free(color_map);

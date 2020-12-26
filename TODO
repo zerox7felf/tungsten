@@ -8,18 +8,18 @@
  - Event management for entities
     ...other than keyboardstate.
  - Maintain fov when changing window size
- - Map rendering with 2d z-buffer
  - Multiple z-layers in map format
  - Multiple z-layers in map rendering
 
 ==================================================
                     In Progress
 ==================================================
- - Map format: serialization
+ - Map rendering with 2d z-buffer
 
 ==================================================
                         Done
 ==================================================
+ - Map format: serialization
  - Map format: use slev maps in engine
  - Map format: load height/color maps into slev map
  - Log prompt
