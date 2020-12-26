@@ -15,11 +15,11 @@
 ==================================================
                     In Progress
 ==================================================
- - Map format: use slev maps in engine
  - Map format: serialization
 
 ==================================================
                         Done
 ==================================================
+ - Map format: use slev maps in engine
  - Map format: load height/color maps into slev map
  - Log prompt
