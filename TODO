@@ -10,6 +10,7 @@
  - Maintain fov when changing window size
  - Multiple z-layers in map format
  - Multiple z-layers in map rendering
+ - Clean up terrain camera
 
 ==================================================
                     In Progress
