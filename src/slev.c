@@ -61,7 +61,6 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    logger_log(logger, INFO, "Loading height and color map into slev format...");
     Slev_Map* output_map = slev_map_from_hc_maps(color_map, height_map, map_width, map_height);
     
     slev_map_free(output_map);

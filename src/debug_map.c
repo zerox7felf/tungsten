@@ -1,5 +1,5 @@
 #include "entity.h"
-#include "map.h"
+#include "slev_map.h"
 #include "camera_terrain.h"
 #include "debug_map.h"
 #include "log.h"
@@ -10,12 +10,13 @@ extern Logger* logger;
 static void debug_map_draw(void* entity, int dt) {
     Debug_Map_Data* debug_map_data = ((Entity*)entity)->entity_data;
     Engine* engine = ((Entity*)entity)->engine;
-    Map* map = debug_map_data->map;
-    for (int x = 0; x < map->surface->w; x+=4) {
-        for (int y = 0; y < map->surface->h; y+=4) {
-            SDL_Color color = map_get_coords(map, x, y);
-            SDL_SetRenderDrawColor(engine->ren, color.r, color.g, color.b, 255);
-            SDL_RenderDrawPoint(engine->ren, x/4, y/4);
+    Slev_Map* map = debug_map_data->map;
+    for (int x = 0; x < map->w; x+=1) {
+        for (int y = 0; y < map->h; y+=1) {
+            SDL_Color color = slev_map_get_coords(map, x, y).color;
+            int height = slev_map_get_coords(map, x, y).height;
+            SDL_SetRenderDrawColor(engine->ren, color.r/2+height/2, color.g/2+height/2, color.b/2+height/2, 255);
+            SDL_RenderDrawPoint(engine->ren, x, y);
         }
     }
 }
@@ -26,7 +27,7 @@ static void debug_map_free(void* entity) {
     ((Entity*)entity)->entity_data = NULL;
 }
 
-Entity* debug_map_new(void* engine, Map* map, Camera_Terrain_Data* camera_data) {
+Entity* debug_map_new(void* engine, Slev_Map* map, Camera_Terrain_Data* camera_data) {
     Entity* debug_map = entity_new(
         engine,
         ENTTYPE_NONE,

@@ -1,5 +1,6 @@
 #include "common.h"
 #include "map.h"
+#include "slev_map.h"
 #include "camera_terrain.h"
 #include "entity.h"
 #include "engine.h"
@@ -70,7 +71,9 @@ static void camera_terrain_update(void* entity, int dt) {
         camera_data->dir_vert-=5;
 
     camera_data->dir = fmodf(camera_data->dir, 2*3.1415f);
-    camera_data->z = map_get_coords(camera_data->height_map, camera_data->x*VOXEL_DENSITY*HEIGHTMAP_SCALE, camera_data->y*VOXEL_DENSITY*HEIGHTMAP_SCALE).r + 10;
+    //camera_data->z = map_get_coords(camera_data->height_map, camera_data->x*VOXEL_DENSITY*HEIGHTMAP_SCALE, camera_data->y*VOXEL_DENSITY*HEIGHTMAP_SCALE).r + 10;
+    //camera_data->z = camera_data->map->map[(int)(camera_data->x*VOXEL_DENSITY)*(int)(camera_data->y*VOXEL_DENSITY)].height + 10;
+    camera_data->z = slev_map_get_coords(camera_data->map, (int)(camera_data->x*VOXEL_DENSITY), (int)(camera_data->y*VOXEL_DENSITY)).height + 10;
 }
 
 static void camera_terrain_draw(void* entity, int dt) {
@@ -115,13 +118,17 @@ static void camera_terrain_draw(void* entity, int dt) {
         float dy = (pright_y - pleft_y) / (w/(int)render_detail);
 
         for (int x = 0; x < w; x+=(int)render_detail) {
-            SDL_Color height_map_color;
-            height_map_color = map_get_coords(camera_data->height_map, pleft_x*VOXEL_DENSITY*HEIGHTMAP_SCALE, pleft_y*VOXEL_DENSITY*HEIGHTMAP_SCALE);
-            int column_height = (camera_data->z - (float)height_map_color.r) / (float)d * SCALE_HEIGHT + HORIZON + camera_data->dir_vert;
+            //SDL_Color height_map_color;
+            //height_map_color = map_get_coords(camera_data->height_map, pleft_x*VOXEL_DENSITY*HEIGHTMAP_SCALE, pleft_y*VOXEL_DENSITY*HEIGHTMAP_SCALE);
+            //int height = camera_data->map->map[(int)(pleft_x*VOXEL_DENSITY)*(int)(pleft_y*VOXEL_DENSITY)].height;
+            int height = slev_map_get_coords(camera_data->map, (int)(pleft_x*VOXEL_DENSITY), (int)(pleft_y*VOXEL_DENSITY)).height;
+            int column_height = (camera_data->z - (float)height) / (float)d * SCALE_HEIGHT + HORIZON + camera_data->dir_vert;
 
             if (column_height < y_buffer[x]) {
                 SDL_Color color_map_color;
-                color_map_color = map_get_coords(camera_data->color_map, pleft_x*VOXEL_DENSITY*HEIGHTMAP_SCALE, pleft_y*VOXEL_DENSITY*HEIGHTMAP_SCALE);
+                //color_map_color = map_get_coords(camera_data->color_map, pleft_x*VOXEL_DENSITY*HEIGHTMAP_SCALE, pleft_y*VOXEL_DENSITY*HEIGHTMAP_SCALE);
+                //color_map_color = camera_data->map->map[(int)(pleft_x*VOXEL_DENSITY)*(int)(pleft_y*VOXEL_DENSITY)].color;
+                color_map_color = slev_map_get_coords(camera_data->map, (int)(pleft_x*VOXEL_DENSITY), (int)(pleft_y*VOXEL_DENSITY)).color;
                 float fog_factor = d/DISTANCE;
                 color_map_color.r = fog_color.r*fog_factor + color_map_color.r*(1-fog_factor);
                 color_map_color.g = fog_color.g*fog_factor + color_map_color.g*(1-fog_factor);
@@ -165,7 +172,7 @@ static void camera_terrain_free(void* entity) {
     ((Entity*)entity)->entity_data = NULL;
 }
 
-Entity* camera_terrain_new(Engine* engine, int x, int y, int z, float dir, Map* height_map, Map* color_map ) {
+/*Entity* camera_terrain_new(Engine* engine, int x, int y, int z, float dir, Map* height_map, Map* color_map ) {
     Entity* camera = entity_new(engine, ENTTYPE_CAMERA, camera_terrain_init, camera_terrain_update, camera_terrain_draw, camera_terrain_free);
     Camera_Terrain_Data* camera_data = malloc(sizeof(Camera_Terrain_Data));
     *camera_data = (Camera_Terrain_Data){
@@ -176,6 +183,22 @@ Entity* camera_terrain_new(Engine* engine, int x, int y, int z, float dir, Map* 
         .dir_vert = 0,
         .height_map = height_map,
         .color_map = color_map,
+    };
+    camera->entity_data = camera_data;
+
+    return camera;
+}*/
+
+Entity* camera_terrain_new(Engine* engine, int x, int y, int z, float dir, Slev_Map* map) {
+    Entity* camera = entity_new(engine, ENTTYPE_CAMERA, camera_terrain_init, camera_terrain_update, camera_terrain_draw, camera_terrain_free);
+    Camera_Terrain_Data* camera_data = malloc(sizeof(Camera_Terrain_Data));
+    *camera_data = (Camera_Terrain_Data){
+        .x = x,
+        .y = y,
+        .z = z,
+        .dir = dir,
+        .dir_vert = 0,
+        .map = map
     };
     camera->entity_data = camera_data;
 
