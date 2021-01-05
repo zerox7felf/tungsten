@@ -11,6 +11,7 @@
  - Multiple z-layers in map format
  - Multiple z-layers in map rendering
  - Clean up terrain camera
+ - Move map to engine from camera_terrain for global access
 
 ==================================================
                     In Progress
@@ -20,6 +21,7 @@
 ==================================================
                         Done
 ==================================================
+ - Controller entity
  - Map format: serialization
  - Map format: use slev maps in engine
  - Map format: load height/color maps into slev map

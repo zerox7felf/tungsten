@@ -6,6 +6,7 @@
 #include "map.h"
 #include "slev_map.h"
 #include "camera_terrain.h"
+#include "controller.h"
 #include "debug_map.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -18,6 +19,7 @@ int main() {
     logger = logger_new(DEBUG); 
     engine = engine_new(logger);
     Entity* player = player_new(engine, 200,200,0.5);
+    Entity* controller = controller_new(engine, 0,0,0, 0,0);
 
     Map* test_map = map_new_bmp("test4.png");
     Map* test_map_color = map_new_bmp("test4_color.png");
@@ -27,12 +29,14 @@ int main() {
     Slev_Map* map = slev_map_from_file("testmap.slev");
 
     Entity* camera_terrain = camera_terrain_new(engine, 250, 400, 200, 0, map);
+    controller_add_child(controller, camera_terrain);
     //Entity* debug_map = debug_map_new(engine, map, camera_terrain->entity_data);
 
     if (engine_init(engine) == 0) {
         logger_log(logger, DEBUG, "Success!");
         //engine_add_entity(engine, player);
         engine_add_entity(engine, camera_terrain);
+        engine_add_entity(engine, controller);
         //engine_add_entity(engine, debug_map);
         engine_run(engine);
     }

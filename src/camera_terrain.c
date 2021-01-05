@@ -4,7 +4,7 @@
 #include "camera_terrain.h"
 #include "entity.h"
 #include "engine.h"
-#include "log.h"
+#include "controller.h"
 #include <stdio.h>
 #include <string.h>
 #include <SDL2/SDL.h>
@@ -22,62 +22,14 @@ static void camera_terrain_init(void* entity) {
 }
 
 static void camera_terrain_update(void* entity, int dt) {
-    Camera_Terrain_Data* camera_data = (Camera_Terrain_Data*)((Entity*)entity)->entity_data;
+    Camera_Terrain_Data* camera_data = (Camera_Terrain_Data*)((Controller_Entity_Data*)((Entity*)entity)->entity_data)->entity_data;
     Engine* engine = ((Entity*)entity)->engine;
-
-    float move_dist = 0.012*dt;
-    if (engine->keyboard_state[SDL_SCANCODE_LSHIFT])
-        move_dist *= 1.7;
-
-    if (engine->keyboard_state[SDL_SCANCODE_W]) {
-        //camera_data->y--;
-        float dy = move_dist * cosf(camera_data->dir);
-        float dx = move_dist * sinf(camera_data->dir);
-        camera_data->y -= dy;
-        camera_data->x -= dx;
-    }
-
-    if (engine->keyboard_state[SDL_SCANCODE_S]) {
-        //camera_data->y++;
-        float dy = move_dist * cosf(camera_data->dir);
-        float dx = move_dist * sinf(camera_data->dir);
-        camera_data->y += dy;
-        camera_data->x += dx;
-    }
-
-    if (engine->keyboard_state[SDL_SCANCODE_D]) {
-        //camera_data->x++;
-        float dy = move_dist * cosf(3.1415f/2 + camera_data->dir);
-        float dx = move_dist * sinf(3.1415f/2 + camera_data->dir);
-        camera_data->y += dy;
-        camera_data->x += dx;
-    }
-
-    if (engine->keyboard_state[SDL_SCANCODE_A]) {
-        //camera_data->x--;
-        float dy = move_dist * cosf(3.1415f/2 + camera_data->dir);
-        float dx = move_dist * sinf(3.1415f/2 + camera_data->dir);
-        camera_data->y -= dy;
-        camera_data->x -= dx;
-    }
-
-    if (engine->keyboard_state[SDL_SCANCODE_LEFT])
-        camera_data->dir+=.1;
-    if (engine->keyboard_state[SDL_SCANCODE_RIGHT])
-        camera_data->dir-=.1;
-    if (engine->keyboard_state[SDL_SCANCODE_UP])
-        camera_data->dir_vert+=5;
-    if (engine->keyboard_state[SDL_SCANCODE_DOWN])
-        camera_data->dir_vert-=5;
-
-    camera_data->dir = fmodf(camera_data->dir, 2*3.1415f);
-    //camera_data->z = map_get_coords(camera_data->height_map, camera_data->x*VOXEL_DENSITY*HEIGHTMAP_SCALE, camera_data->y*VOXEL_DENSITY*HEIGHTMAP_SCALE).r + 10;
-    //camera_data->z = camera_data->map->map[(int)(camera_data->x*VOXEL_DENSITY)*(int)(camera_data->y*VOXEL_DENSITY)].height + 10;
-    camera_data->z = slev_map_get_coords(camera_data->map, (int)(camera_data->x*VOXEL_DENSITY), (int)(camera_data->y*VOXEL_DENSITY)).height + 10;
 }
 
 static void camera_terrain_draw(void* entity, int dt) {
-    Camera_Terrain_Data* camera_data = (Camera_Terrain_Data*)((Entity*)entity)->entity_data;
+    // haha wow this is ugly. We are getting the entity_data from entity, casting it to controller_entity_data
+    // and then getting entity_data from that.
+    Camera_Terrain_Data* camera_data = (Camera_Terrain_Data*)((Controller_Entity_Data*)((Entity*)entity)->entity_data)->entity_data;
     Engine* engine = (Engine*)((Entity*)entity)->engine;
 
     int w,h;
@@ -167,8 +119,9 @@ static void camera_terrain_draw(void* entity, int dt) {
 }
 
 static void camera_terrain_free(void* entity) {
-    Camera_Terrain_Data* camera_data = (Camera_Terrain_Data*)((Entity*)entity)->entity_data;
-    free(camera_data);
+    Controller_Entity_Data* controller_data = (Controller_Entity_Data*)((Entity*)entity)->entity_data;
+    free(controller_data->entity_data);
+    free(controller_data);
     ((Entity*)entity)->entity_data = NULL;
 }
 
@@ -189,6 +142,15 @@ static void camera_terrain_free(void* entity) {
     return camera;
 }*/
 
+static void camera_terrain_follow(Entity* entity, float x, float y, float z, float dir, float dir_vert) {
+    Camera_Terrain_Data* camera_data = (Camera_Terrain_Data*)((Controller_Entity_Data*)entity->entity_data)->entity_data;
+    camera_data->x = x;
+    camera_data->y = y;
+    camera_data->z = z;
+    camera_data->dir = dir;
+    camera_data->dir_vert = dir_vert;
+}
+
 Entity* camera_terrain_new(Engine* engine, int x, int y, int z, float dir, Slev_Map* map) {
     Entity* camera = entity_new(engine, ENTTYPE_CAMERA, camera_terrain_init, camera_terrain_update, camera_terrain_draw, camera_terrain_free);
     Camera_Terrain_Data* camera_data = malloc(sizeof(Camera_Terrain_Data));
@@ -200,7 +162,12 @@ Entity* camera_terrain_new(Engine* engine, int x, int y, int z, float dir, Slev_
         .dir_vert = 0,
         .map = map
     };
-    camera->entity_data = camera_data;
+    Controller_Entity_Data* camera_controller_data = malloc(sizeof(Controller_Entity_Data));
+    *camera_controller_data = (Controller_Entity_Data){
+        .entity_data = camera_data,
+        .follow = camera_terrain_follow
+    };
+    camera->entity_data = camera_controller_data;
 
     return camera;
 }

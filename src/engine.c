@@ -158,10 +158,7 @@ void engine_run(Engine* engine) {
         Uint32 now = SDL_GetTicks();
         int dt = now - engine->last_draw;
 
-        if (dt < 16)
-            SDL_Delay(16-dt);
-        //else
-        //  SDL_Delay(1);
+        SDL_Delay(1);
     }
 }
 
