@@ -1,4 +1,6 @@
 .DEFAULT_GOAL := all
+.PHONY: run clean gen
+
 include smk_out.mk
 
 gen:
@@ -6,8 +8,6 @@ gen:
 
 all: $(BUILD_DIR)/tungsten $(BUILD_DIR)/slev
 slev: $(BUILD_DIR)/slev
-
-.PHONY: run clean
 
 run: all
 	$(BUILD_DIR)/tungsten
